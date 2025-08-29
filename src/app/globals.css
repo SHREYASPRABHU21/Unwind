@@ -1,42 +1,46 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import "tailwindcss";
 
-@media (prefers-color-scheme: dark) {
+@import url('https://fonts.googleapis.com/css2?family=Playwrite+DE+Grund:wght@100..400&display=swap');
+
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --primary-bg: #6FE6FC;
+    --secondary-bg: #B8F2FF;
+    --accent-blue: #4DD0E1;
+    --accent-teal: #26C6DA;
+    --text-dark: #1A1A1A;
+    --text-muted: #4A5568;
+    --card-bg: #FFFFFF;
+    --session-card: #FFE5B4;
+    --border-light: #E2E8F0;
+  }
+  
+  * {
+    font-family: 'Playwrite DE Grund', cursive;
+  }
+  
+  body {
+    background-color: var(--primary-bg);
+    color: var(--text-dark);
   }
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+@layer utilities {
+  .card-transition {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .expand-session {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  
+  .expand-research {
+    grid-column: span 2;
+  }
+  
+  .expand-full {
+    grid-column: span 3;
+    grid-row: span 2;
   }
 }

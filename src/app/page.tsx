@@ -1,95 +1,76 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
 
-export default function Home() {
+import { useState, useEffect } from 'react';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth, googleProvider } from '@/lib/firebase';
+import { signInWithPopup } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
+
+export default function LandingPage() {
+  const [user, loading] = useAuthState(auth);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      // Store user in Supabase after Firebase auth
+      await fetch('/api/auth/sync-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid: result.user.uid,
+          email: result.user.email,
+          name: result.user.displayName
+        })
+      });
+    } catch (error) {
+      console.error('Sign in error:', error);
+    }
+  };
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4">
+      {/* User Profile Picture - Top Right */}
+      {user && (
+        <div className="absolute top-6 right-6">
+          <img 
+            src={user.photoURL || ''} 
+            alt="Profile"
+            className="w-12 h-12 rounded-full border-2 border-white shadow-lg"
+          />
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      )}
+
+      {/* Hero Section */}
+      <div className="text-center space-y-8 max-w-2xl">
+        {/* Logo */}
+        <div className="space-y-4">
+          <h1 className="text-6xl font-bold text-slate-800 tracking-tight">
+            Unwind
+          </h1>
+          <p className="text-2xl text-slate-600 font-medium">
+            Your safe shore in a restless sea
+          </p>
+        </div>
+
+        {/* Auth Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
+          <button
+            onClick={handleGoogleSignIn}
+            className="bg-white text-slate-800 px-8 py-4 rounded-2xl font-semibold 
+                     shadow-lg hover:shadow-xl transition-all duration-300
+                     border-2 border-slate-200 hover:border-slate-300"
+          >
+            Continue with Google
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
