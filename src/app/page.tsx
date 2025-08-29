@@ -19,16 +19,19 @@ export default function LandingPage() {
   const handleGoogleSignIn = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      // Store user in Supabase after Firebase auth
+      
+      // Sync user to both databases
       await fetch('/api/auth/sync-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           uid: result.user.uid,
           email: result.user.email,
-          name: result.user.displayName
+          name: result.user.displayName,
+          photoURL: result.user.photoURL
         })
       });
+      
     } catch (error) {
       console.error('Sign in error:', error);
     }
